@@ -13,14 +13,20 @@ const pool = mysql.createPool(config)
 
 app.get('/', (req, res) => {
     const sqlInsert = `INSERT INTO people(name) values('Paulo Enrique')`
-    const sqlSelect = `SELECT * FROM people ORDER BY id DESC LIMIT 1`
+    const sqlSelect = `SELECT * FROM people ORDER BY id DESC`
 
     pool.query(sqlInsert, (err, insertResult) => {
         if (err) throw err;
 
         pool.query(sqlSelect, (err, selectResult) => {
             if (err) throw err;
-            res.send(`<h1>FullCycle</h1><br><h1>Último registro: ${selectResult[0].name}</h1>`)
+            let html = '<h1>FullCycle</h1><br>';
+
+            selectResult.forEach(row => {
+                html += `ID: ${row.id} - Name: ${row.name}<br>`;
+            });
+
+            res.send(html);
         })
     })
 })

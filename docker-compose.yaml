@@ -12,18 +12,24 @@ services:
     tty: true
     expose:
       - "3000"
+    command: node index.js
+    depends_on:
+      - db
 
   db:
-    image: mysql:5.7
+    image: mysql:8.0
     container_name: db
     restart: always
-    tty: true
-    volumes:
-      - data_db:/var/lib/mysql 
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: nodedb
-    command: --innodb-use-native-aio=0 
+      MYSQL_ROOT_HOST: '%'
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3306"
+    volumes:
+      - "./mysql:/var/lib/mysql"
+      - "./mysql-init:/docker-entrypoint-initdb.d"
     networks:
       - node-network
 
@@ -42,6 +48,3 @@ services:
 networks:
   node-network:
     driver: bridge
-
-volumes:
-  data_db:
